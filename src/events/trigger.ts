@@ -30,6 +30,7 @@ fn.trigger = function ( this: Cash, event: Event | string, data?: any ) {
   }
 
   event.___td = data;
+  event.___array = Array.isArray(data);
 
   const isEventFocus = ( event.___ot in eventsFocus );
 
