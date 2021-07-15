@@ -690,7 +690,13 @@ function on(eventFullName, selector, data, callback, _one) {
                         return data;
                     }
                 });
-                const returnValue = callback.call(thisArg, event, event.___td);
+                let returnValue = null;
+                if (Array.isArray(event.___td) && event.___array) {
+                    returnValue = callback.call(thisArg, event, ...event.___td);
+                }
+                else {
+                    returnValue = callback.call(thisArg, event, event.___td);
+                }
                 if (_one) {
                     removeEvent(ele, name, namespaces, selector, finalCallback);
                 }
@@ -733,6 +739,7 @@ fn.trigger = function (event, data) {
         event.___ot = nameOriginal;
     }
     event.___td = data;
+    event.___array = Array.isArray(data);
     const isEventFocus = (event.___ot in eventsFocus);
     return this.each((i, ele) => {
         if (isEventFocus && isFunction(ele[event.___ot])) {

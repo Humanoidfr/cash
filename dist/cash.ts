@@ -1641,7 +1641,13 @@ function on ( this: Cash, eventFullName: Record<string, EventCallback> | string,
           }
         });
 
-        const returnValue = callback.call ( thisArg, event, event.___td );
+        let returnValue = null;
+
+        if (Array.isArray(event.___td) && event.___array) {
+          returnValue = callback.call ( thisArg, event, ...event.___td );
+        } else {
+          returnValue = callback.call ( thisArg, event, event.___td );
+        }
 
         if ( _one ) {
 
@@ -1761,6 +1767,7 @@ fn.trigger = function ( this: Cash, event: Event | string, data?: any ) {
   }
 
   event.___td = data;
+  event.___array = Array.isArray(data);
 
   const isEventFocus = ( event.___ot in eventsFocus );
 
@@ -2909,6 +2916,14 @@ fn.siblings = function ( this: Cash, comparator?: Comparator ) {
 
 // @priority -100
 // @require ./cash.ts
+// @require ./variables.ts
 
-export default cash;
-export {Cash, CashStatic, Ele as Element, Selector, Comparator, Context};
+if ( typeof exports !== 'undefined' ) { // Node.js
+
+  module.exports = cash;
+
+} else { // Browser
+
+  win['cash'] = win['$'] = cash;
+
+}

@@ -2,6 +2,14 @@
 (function(){
 "use strict";
 
+var __spreadArray = void 0 && (void 0).__spreadArray || function (to, from) {
+  for (var i = 0, il = from.length, j = to.length; i < il; i++, j++) {
+    to[j] = from[i];
+  }
+
+  return to;
+};
+
 var propMap = {
   /* GENERAL */
   "class": 'className',
@@ -802,8 +810,8 @@ function on(eventFullName, selector, data, callback, _one) {
         nameOriginal = _a[0],
         namespaces = _a[1],
         name = getEventNameBubbling(nameOriginal),
-        isEventHover = nameOriginal in eventsHover,
-        isEventFocus = nameOriginal in eventsFocus;
+        isEventHover = (nameOriginal in eventsHover),
+        isEventFocus = (nameOriginal in eventsFocus);
 
     if (!name) return;
 
@@ -845,7 +853,13 @@ function on(eventFullName, selector, data, callback, _one) {
             return data;
           }
         });
-        var returnValue = callback.call(thisArg, event, event.___td);
+        var returnValue = null;
+
+        if (Array.isArray(event.___td) && event.___array) {
+          returnValue = callback.call.apply(callback, __spreadArray([thisArg, event], event.___td));
+        } else {
+          returnValue = callback.call(thisArg, event, event.___td);
+        }
 
         if (_one) {
           removeEvent(ele, name, namespaces, selector, finalCallback);
@@ -903,7 +917,8 @@ fn.trigger = function (event, data) {
   }
 
   event.___td = data;
-  var isEventFocus = event.___ot in eventsFocus;
+  event.___array = Array.isArray(data);
+  var isEventFocus = (event.___ot in eventsFocus);
   return this.each(function (i, ele) {
     if (isEventFocus && isFunction(ele[event.___ot])) {
       ele["___i" + event.type] = true; // Ensuring the native event is ignored

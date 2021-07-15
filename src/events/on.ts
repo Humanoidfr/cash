@@ -135,9 +135,9 @@ function on ( this: Cash, eventFullName: Record<string, EventCallback> | string,
             return data;
           }
         });
-        
+
         let returnValue = null;
-        
+
         if (Array.isArray(event.___td) && event.___array) {
           returnValue = callback.call ( thisArg, event, ...event.___td );
         } else {
