@@ -9,6 +9,6 @@ function find ( selector: string, context: Ele ): ArrayLike<Element> {
              ? context.getElementsByClassName ( selector.slice ( 1 ) )
              : tagRe.test ( selector )
                ? context.getElementsByTagName ( selector )
-               : context.querySelectorAll ( selector.replace(/(\[[^=]+=)([^"\]]+)(])/, '$1"$2"$3') );
+               : context.querySelectorAll ( selector.replace(/(\[[^=]+=)([^"\]]+)(])/, '$1"$2"$3') ); // add quote around attr value
 
 }
