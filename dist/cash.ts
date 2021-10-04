@@ -97,7 +97,7 @@ function find ( selector: string, context: Ele ): ArrayLike<Element> {
              ? context.getElementsByClassName ( selector.slice ( 1 ) )
              : tagRe.test ( selector )
                ? context.getElementsByTagName ( selector )
-               : context.querySelectorAll ( selector );
+               : context.querySelectorAll ( selector.replace(/(\[[^=]+=)([^"\]]+)(])/, '$1"$2"$3') ); // add quote around attr value
 
 }
 
@@ -2916,14 +2916,6 @@ fn.siblings = function ( this: Cash, comparator?: Comparator ) {
 
 // @priority -100
 // @require ./cash.ts
-// @require ./variables.ts
 
-if ( typeof exports !== 'undefined' ) { // Node.js
-
-  module.exports = cash;
-
-} else { // Browser
-
-  win['cash'] = win['$'] = cash;
-
-}
+export default cash;
+export {Cash, CashStatic, Ele as Element, Selector, Comparator, Context};
