@@ -26,6 +26,10 @@ function attempt(fn, arg) {
 const doc = document, win = window, docEle = doc.documentElement, createElement = doc.createElement.bind(doc), div = createElement('div'), table = createElement('table'), tbody = createElement('tbody'), tr = createElement('tr'), { isArray, prototype: ArrayPrototype } = Array, { concat, filter, indexOf, map, push, slice, some, splice } = ArrayPrototype;
 const idRe = /^#(?:[\w-]|\\.|[^\x00-\xa0])*$/, classRe = /^\.(?:[\w-]|\\.|[^\x00-\xa0])*$/, htmlRe = /<.+>/, tagRe = /^\w+$/;
 // @require ./variables.ts
+const input = {
+    ':input': 'input, textarea, select, button',
+    ':button': 'button',
+};
 function find(selector, context) {
     return !selector || (!isDocument(context) && !isElement(context))
         ? []
@@ -33,8 +37,8 @@ function find(selector, context) {
             ? context.getElementsByClassName(selector.slice(1))
             : tagRe.test(selector)
                 ? context.getElementsByTagName(selector)
-                : [':input', ':button'].indexOf(selector) !== -1
-                    ? context.querySelectorAll(selector.substring(1))
+                : input[selector]
+                    ? context.querySelectorAll(input[selector])
                     : context.querySelectorAll(selector.replace(/(\[[^=]+=)([^"\]]+)(])/, '$1"$2"$3')); // add quote around attr value
 }
 // @require ./find.ts

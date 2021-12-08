@@ -62,8 +62,13 @@ var idRe = /^#(?:[\w-]|\\.|[^\x00-\xa0])*$/,
     htmlRe = /<.+>/,
     tagRe = /^\w+$/; // @require ./variables.ts
 
+var input = {
+  ':input': 'input, textarea, select, button',
+  ':button': 'button'
+};
+
 function find(selector, context) {
-  return !selector || !isDocument(context) && !isElement(context) ? [] : classRe.test(selector) ? context.getElementsByClassName(selector.slice(1)) : tagRe.test(selector) ? context.getElementsByTagName(selector) : [':input', ':button'].indexOf(selector) !== -1 ? context.querySelectorAll(selector.substring(1)) : context.querySelectorAll(selector.replace(/(\[[^=]+=)([^"\]]+)(])/, '$1"$2"$3')); // add quote around attr value
+  return !selector || !isDocument(context) && !isElement(context) ? [] : classRe.test(selector) ? context.getElementsByClassName(selector.slice(1)) : tagRe.test(selector) ? context.getElementsByTagName(selector) : input[selector] ? context.querySelectorAll(input[selector]) : context.querySelectorAll(selector.replace(/(\[[^=]+=)([^"\]]+)(])/, '$1"$2"$3')); // add quote around attr value
 } // @require ./find.ts
 // @require ./variables.ts
 
