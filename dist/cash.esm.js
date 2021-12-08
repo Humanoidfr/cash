@@ -33,7 +33,9 @@ function find(selector, context) {
             ? context.getElementsByClassName(selector.slice(1))
             : tagRe.test(selector)
                 ? context.getElementsByTagName(selector)
-                : context.querySelectorAll(selector.replace(/(\[[^=]+=)([^"\]]+)(])/, '$1"$2"$3')); // add quote around attr value
+                : [':input', ':button'].indexOf(selector) !== -1
+                    ? context.querySelectorAll(selector.substring(1))
+                    : context.querySelectorAll(selector.replace(/(\[[^=]+=)([^"\]]+)(])/, '$1"$2"$3')); // add quote around attr value
 }
 // @require ./find.ts
 // @require ./variables.ts

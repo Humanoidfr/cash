@@ -2,14 +2,12 @@
 (function(){
 "use strict";
 
-var __spreadArray = void 0 && (void 0).__spreadArray || function (to, from, pack) {
-  if (pack || arguments.length === 2) for (var i = 0, l = from.length, ar; i < l; i++) {
-    if (ar || !(i in from)) {
-      if (!ar) ar = Array.prototype.slice.call(from, 0, i);
-      ar[i] = from[i];
-    }
+var __spreadArray = void 0 && (void 0).__spreadArray || function (to, from) {
+  for (var i = 0, il = from.length, j = to.length; i < il; i++, j++) {
+    to[j] = from[i];
   }
-  return to.concat(ar || Array.prototype.slice.call(from));
+
+  return to;
 };
 
 var propMap = {
@@ -65,12 +63,14 @@ var idRe = /^#(?:[\w-]|\\.|[^\x00-\xa0])*$/,
     tagRe = /^\w+$/; // @require ./variables.ts
 
 function find(selector, context) {
-  return !selector || !isDocument(context) && !isElement(context) ? [] : classRe.test(selector) ? context.getElementsByClassName(selector.slice(1)) : tagRe.test(selector) ? context.getElementsByTagName(selector) : context.querySelectorAll(selector.replace(/(\[[^=]+=)([^"\]]+)(])/, '$1"$2"$3')); // add quote around attr value
+  return !selector || !isDocument(context) && !isElement(context) ? [] : classRe.test(selector) ? context.getElementsByClassName(selector.slice(1)) : tagRe.test(selector) ? context.getElementsByTagName(selector) : [':input', ':button'].indexOf(selector) !== -1 ? context.querySelectorAll(selector.substring(1)) : context.querySelectorAll(selector.replace(/(\[[^=]+=)([^"\]]+)(])/, '$1"$2"$3')); // add quote around attr value
 } // @require ./find.ts
 // @require ./variables.ts
 
 
-var Cash = function () {
+var Cash =
+/** @class */
+function () {
   function Cash(selector, context) {
     if (!selector) return;
     if (isCash(selector)) return selector;
@@ -856,7 +856,7 @@ function on(eventFullName, selector, data, callback, _one) {
         var returnValue = null;
 
         if (Array.isArray(event.___td) && event.___array) {
-          returnValue = callback.call.apply(callback, __spreadArray([thisArg, event], event.___td, false));
+          returnValue = callback.call.apply(callback, __spreadArray([thisArg, event], event.___td));
         } else {
           returnValue = callback.call(thisArg, event, event.___td);
         }
