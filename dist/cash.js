@@ -64,9 +64,7 @@ var idRe = /^#(?:[\w-]|\\.|[^\x00-\xa0])*$/,
 
 var input = {
   ':input': 'input, textarea, select, button',
-  ':button': 'button',
-  ':visible': ':not([style="display:none"])',
-  ':hidden': '[style="display:none"]'
+  ':button': 'button'
 };
 
 function find(selector, context) {
@@ -141,11 +139,14 @@ cash.guid = 1; // @require ./cash.ts
 
 function matches(ele, selector) {
   var matches = ele && (ele['matches'] || ele['webkitMatchesSelector'] || ele['msMatchesSelector']);
-  var selectors = {
-    ':visible': ':not([style="display:none"])',
-    ':hidden': '[style="display:none"]'
-  };
-  return !!matches && !!selector && matches.call(ele, selectors[selector] ? selectors[selector] : selector);
+
+  if (selector === ':visible') {
+    return !!(ele.offsetWidth || ele.offsetHeight || ele.getClientRects().length);
+  } else if (selector === ':hidden') {
+    return !(ele.offsetWidth || ele.offsetHeight || ele.getClientRects().length);
+  }
+
+  return !!matches && !!selector && matches.call(ele, selector);
 }
 
 function isCash(x) {

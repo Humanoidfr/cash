@@ -29,8 +29,6 @@ const idRe = /^#(?:[\w-]|\\.|[^\x00-\xa0])*$/, classRe = /^\.(?:[\w-]|\\.|[^\x00
 const input = {
     ':input': 'input, textarea, select, button',
     ':button': 'button',
-    ':visible': ':not([style="display:none"])',
-    ':hidden': '[style="display:none"]',
 };
 function find(selector, context) {
     return !selector || (!isDocument(context) && !isElement(context))
@@ -98,11 +96,13 @@ cash.guid = 1;
 // @require ./cash.ts
 function matches(ele, selector) {
     const matches = ele && (ele['matches'] || ele['webkitMatchesSelector'] || ele['msMatchesSelector']);
-    const selectors = {
-        ':visible': ':not([style="display:none"])',
-        ':hidden': '[style="display:none"]',
-    };
-    return !!matches && !!selector && matches.call(ele, selectors[selector] ? selectors[selector] : selector);
+    if (selector === ':visible') {
+        return !!(ele.offsetWidth || ele.offsetHeight || ele.getClientRects().length);
+    }
+    else if (selector === ':hidden') {
+        return !(ele.offsetWidth || ele.offsetHeight || ele.getClientRects().length);
+    }
+    return !!matches && !!selector && matches.call(ele, selector);
 }
 function isCash(x) {
     return x instanceof Cash;
