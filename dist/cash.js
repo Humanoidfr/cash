@@ -64,7 +64,9 @@ var idRe = /^#(?:[\w-]|\\.|[^\x00-\xa0])*$/,
 
 var input = {
   ':input': 'input, textarea, select, button',
-  ':button': 'button'
+  ':button': 'button',
+  ':visible': ':not([style="display:none"])',
+  ':hidden': '[style="display:none"]'
 };
 
 function find(selector, context) {

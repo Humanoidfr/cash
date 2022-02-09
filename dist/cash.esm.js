@@ -29,6 +29,8 @@ const idRe = /^#(?:[\w-]|\\.|[^\x00-\xa0])*$/, classRe = /^\.(?:[\w-]|\\.|[^\x00
 const input = {
     ':input': 'input, textarea, select, button',
     ':button': 'button',
+    ':visible': ':not([style="display:none"])',
+    ':hidden': '[style="display:none"]',
 };
 function find(selector, context) {
     return !selector || (!isDocument(context) && !isElement(context))
