@@ -141,7 +141,11 @@ cash.guid = 1; // @require ./cash.ts
 
 function matches(ele, selector) {
   var matches = ele && (ele['matches'] || ele['webkitMatchesSelector'] || ele['msMatchesSelector']);
-  return !!matches && !!selector && matches.call(ele, selector);
+  var selectors = {
+    ':visible': ':not([style="display:none"])',
+    ':hidden': '[style="display:none"]'
+  };
+  return !!matches && !!selector && matches.call(ele, selectors[selector] ? selectors[selector] : selector);
 }
 
 function isCash(x) {
