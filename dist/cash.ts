@@ -56,17 +56,24 @@ const tagRe = /^\w+$/;
 
 // @require ./variables.ts
 
+const input = {
+  ':input': 'input, textarea, select, button',
+  ':button': 'button',
+};
+
 function find ( selector: string, context: Ele ): ArrayLike<Element> {
 
-  const isFragment = isDocumentFragment ( context );
+  // const isFragment = isDocumentFragment ( context );
 
-  return !selector || ( !isFragment && !isDocument ( context ) && !isElement ( context ) )
+  return !selector || ( !isDocument ( context ) && !isElement ( context ) )
            ? []
-           : !isFragment && classRe.test ( selector )
-             ? context.getElementsByClassName ( selector.slice ( 1 ).replace ( /\\/g, '' ) )
-             : !isFragment && tagRe.test ( selector )
+           : classRe.test ( selector )
+             ? context.getElementsByClassName ( selector.slice ( 1 ) )
+             : tagRe.test ( selector )
                ? context.getElementsByTagName ( selector )
-               : context.querySelectorAll ( selector );
+               : input[selector]
+                ? context.querySelectorAll(input[selector])
+                : context.querySelectorAll ( selector.replace(/(\[[^=]+=)([^"\]]+)(])/, '$1"$2"$3') ); // add quote around attr value
 
 }
 
@@ -732,6 +739,12 @@ function isHidden ( ele: EleLoose ): boolean {
 function matches ( ele: any, selector: string ): boolean {
 
   const matches = ele && ( ele['matches'] || ele['webkitMatchesSelector'] || ele['msMatchesSelector'] );
+
+  if (selector === ':visible') {
+    return !!( ele.offsetWidth || ele.offsetHeight || ele.getClientRects().length );
+  } else if (selector === ':hidden') {
+    return !( ele.offsetWidth || ele.offsetHeight || ele.getClientRects().length );
+  }
 
   return !!matches && !!selector && matches.call ( ele, selector );
 
@@ -2375,6 +2388,7 @@ fn.trigger = function ( this: Cash, event: Event | string, data?: any ) {
   }
 
   event.___td = data;
+  event.___array = Array.isArray(data);
 
   const isEventFocus = ( event.___ot in eventsFocus );
 
@@ -2713,7 +2727,13 @@ function on ( this: Cash, eventFullName: Record<string, EventCallback> | string,
           }
         });
 
-        const returnValue = callback.call ( thisArg, event, event.___td );
+        let returnValue = null;
+
+        if (Array.isArray(event.___td) && event.___array) {
+          returnValue = callback.call ( thisArg, event, ...event.___td );
+        } else {
+          returnValue = callback.call ( thisArg, event, event.___td );
+        }
 
         if ( _one ) {
 

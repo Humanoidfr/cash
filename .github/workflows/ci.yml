@@ -1,0 +1,13 @@
+on:
+  push:
+    branches:
+      - main
+
+name: CI
+
+jobs:
+  release-js-package:
+    uses: Humanoidfr/humanoid-github-workflows/.github/workflows/release-js-package.yml@main
+    secrets:
+      READ_PACKAGES_TOKEN: ${{ secrets.READ_PACKAGES_TOKEN }}
+      WRITE_PACKAGES_TOKEN: ${{ secrets.GITHUB_TOKEN }}

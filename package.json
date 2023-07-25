@@ -1,6 +1,5 @@
 {
-  "name": "cash-dom",
-  "repository": "github:fabiospampinato/cash",
+  "name": "@humanoidfr/cash-dom",
   "description": "An absurdly small jQuery alternative for modern browsers.",
   "version": "8.1.5",
   "license": "MIT",
@@ -12,6 +11,14 @@
   "files": [
     "dist"
   ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Humanoidfr/cash.git"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com/",
+    "scope": "@humanoidfr"
+  },
   "scripts": {
     "build": "bash ./tasks/build.sh",
     "watch": "monex --watch src --exec npm:build",
@@ -25,8 +32,7 @@
     "test:jquery:reverse:build": "cat ./node_modules/jquery/dist/jquery.js ./dist/cash.min.js ./test/jquery_reverse_patch.js > ./dist/cash.js",
     "test:jquery:reverse:build:watch": "while sleep 1; do npm run test:jquery:reverse:build; done",
     "test:playwright": "node ./test/playwright.mjs",
-    "graph": "minipacco graph src/export_esm.ts",
-    "prepublishOnly": "npm run build && npm run test:playwright"
+    "graph": "minipacco graph src/export_esm.ts"
   },
   "devDependencies": {
     "esbuild": "^0.17.10",

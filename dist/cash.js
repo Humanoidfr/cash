@@ -1,5 +1,14 @@
 (function(){
 "use strict";
+var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
+    if (pack || arguments.length === 2) for (var i = 0, l = from.length, ar; i < l; i++) {
+        if (ar || !(i in from)) {
+            if (!ar) ar = Array.prototype.slice.call(from, 0, i);
+            ar[i] = from[i];
+        }
+    }
+    return to.concat(ar || Array.prototype.slice.call(from));
+};
 var doc = document;
 var win = window;
 var docEle = doc.documentElement;
@@ -15,15 +24,21 @@ var classRe = /^\.(?:[\w-]|\\.|[^\x00-\xa0])*$/;
 var htmlRe = /<.+>/;
 var tagRe = /^\w+$/;
 // @require ./variables.ts
+var input = {
+    ':input': 'input, textarea, select, button',
+    ':button': 'button',
+};
 function find(selector, context) {
-    var isFragment = isDocumentFragment(context);
-    return !selector || (!isFragment && !isDocument(context) && !isElement(context))
+    // const isFragment = isDocumentFragment ( context );
+    return !selector || (!isDocument(context) && !isElement(context))
         ? []
-        : !isFragment && classRe.test(selector)
-            ? context.getElementsByClassName(selector.slice(1).replace(/\\/g, ''))
-            : !isFragment && tagRe.test(selector)
+        : classRe.test(selector)
+            ? context.getElementsByClassName(selector.slice(1))
+            : tagRe.test(selector)
                 ? context.getElementsByTagName(selector)
-                : context.querySelectorAll(selector);
+                : input[selector]
+                    ? context.querySelectorAll(input[selector])
+                    : context.querySelectorAll(selector.replace(/(\[[^=]+=)([^"\]]+)(])/, '$1"$2"$3')); // add quote around attr value
 }
 // @require ./find.ts
 // @require ./variables.ts
@@ -312,6 +327,12 @@ function isHidden(ele) {
 // @require ./cash.ts
 function matches(ele, selector) {
     var matches = ele && (ele['matches'] || ele['webkitMatchesSelector'] || ele['msMatchesSelector']);
+    if (selector === ':visible') {
+        return !!(ele.offsetWidth || ele.offsetHeight || ele.getClientRects().length);
+    }
+    else if (selector === ':hidden') {
+        return !(ele.offsetWidth || ele.offsetHeight || ele.getClientRects().length);
+    }
     return !!matches && !!selector && matches.call(ele, selector);
 }
 // @require ./matches.ts
@@ -936,6 +957,7 @@ fn.trigger = function (event, data) {
         event.___ot = nameOriginal;
     }
     event.___td = data;
+    event.___array = Array.isArray(data);
     var isEventFocus = (event.___ot in eventsFocus);
     return this.each(function (i, ele) {
         if (isEventFocus && isFunction(ele[event.___ot])) {
@@ -1097,7 +1119,13 @@ function on(eventFullName, selector, data, callback, _one) {
                         return data;
                     }
                 });
-                var returnValue = callback.call(thisArg, event, event.___td);
+                var returnValue = null;
+                if (Array.isArray(event.___td) && event.___array) {
+                    returnValue = callback.call.apply(callback, __spreadArray([thisArg, event], event.___td, false));
+                }
+                else {
+                    returnValue = callback.call(thisArg, event, event.___td);
+                }
                 if (_one) {
                     removeEvent(ele, name, namespaces, selector, finalCallback);
                 }
